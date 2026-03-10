@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<􀆟tle>Bot Vision Dashboard</􀆟tle>
+<style>
+body { font-family: Arial, sans-serif; text-align: center; background-color: #222; color:
+#fff; }
+.dashboard-container { display: flex; flex-direction: column; align-items: center; margin-top:
+20px; }
+.video-feed { border: 4px solid #4CAF50; border-radius: 10px; width: 640px; height:
+480px; }
+.stats { margin-top: 20px; font-size: 24px; padding: 15px; background: #333; border-radius:
+8px; width: 610px; }
+.highlight { color: #4CAF50; font-weight: bold; }
+bu􀆩on { margin-top: 15px; padding: 10px 20px; font-size: 18px; cursor: pointer;
+background-color: #f44336; color: white; border: none; border-radius: 5px; }
+bu􀆩on:hover { background-color: #d32f2f; }
+</style>
+</head>
+<body>
+<h1>Autonomous Bot Dashboard</h1>
+<div class="dashboard-container">
+<img class="video-feed" src="/video_feed" alt="Live Video Feed">
+<div class="stats">
+<p>Cards Detected: <span id="card-count" class="highlight">0</span> / 16</p>
+<p>Mission Time: <span id="􀆟mer" class="highlight">00:00</span></p>
+<p>Mission Status: <span id="status" class="highlight">Searching...</span></p>
+<bu􀆩on onclick="resetMission()">RESET BOT</bu􀆩on>
+</div>
+</div>
+<script>
+setInterval(function() {
+fetch('/get_stats')
+.then(response => response.json())
+.then(data => {
+document.getElementById('card-count').innerText = data.cards_detected;
+document.getElementById('􀆟mer').innerText = data.􀆟me_elapsed;
+if (data.cards_detected >= 16) {
+document.getElementById('status').innerText = "All 16 Cards Found! Returning
+                to base.";
+document.getElementById('status').style.color = "#FFD700";
+} else {
+document.getElementById('status').innerText = "Searching...";
+document.getElementById('status').style.color = "#4CAF50";
+}
+});
+}, 1000);
+function resetMission() {
+fetch('/reset', { method: 'POST' })
+.then(response => response.json())
+.then(data => {
+console.log("Memory wiped. Awai􀆟ng new targets.");
+});
+}
+</script>
+</body>
+</html>
