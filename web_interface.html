@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Autonomous Bot Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #1e1e1e; color: #fff; text-align: center; }
+        .dashboard { max-width: 800px; margin: auto; padding: 20px; }
+        .video-feed { border: 3px solid #00ff00; width: 640px; height: 480px; background-color: #000; margin: 20px auto; }
+        .stats { font-size: 20px; margin-bottom: 20px; text-align: left; background: #2a2a2a; padding: 15px; border-radius: 8px; }
+        .btn { background-color: #ff4444; color: white; padding: 10px 20px; font-size: 18px; border: none; cursor: pointer; border-radius: 5px; }
+        .btn:hover { background-color: #cc0000; }
+        .highlight { color: #00ff00; font-weight: bold; }
+        .card-list { color: #ffaa00; font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <h1>Bot Vision Dashboard</h1>
+
+        <div class="stats">
+          <p>Cards Detected: <span id="cards_count" class="highlight">0</span> / 12</p>
+            <p>Found Items: <span id="card_list_display" class="card-list">None yet...</span></p>
+            <p>Mission Time: <span id="time_elapsed">00:00</span></p>
+        </div>
+
+        <img class="video-feed" src="/video_feed" alt="Bot Camera Feed Offline">
+
+        <br>
+        <button class="btn" onclick="resetBot()">RESET BOT MEMORY</button>
+    </div>
+
+    <script>
+        // Ping the server every 1 second (1000ms) to get updated stats
+        setInterval(function() {
+            fetch('/get_stats')
+                .then(response => response.json())
+                .then(data => {
+                    // Update numbers and time
+                    document.getElementById('cards_count').innerText = data.cards_detected;
+                    document.getElementById('time_elapsed').innerText = data.time_elapsed;
+
+                    // Update the list of names!
+                    if (data.detected_names.length > 0) {
+                        document.getElementById('card_list_display').innerText = data.detected_names.join(', ');
+                    } else {
+                        document.getElementById('card_list_display').innerText = "None yet...";
+                    }
+                });
+        }, 1000);
+
+        // Tell the server to wipe the detected cards list and reset the timer
+        function resetBot() {
+            fetch('/reset', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => alert(data.status));
+                }
+    </script>
+</body>
+</html>
